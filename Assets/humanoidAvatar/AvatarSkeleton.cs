@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Diagnostics.Tracing;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -52,40 +53,8 @@ public class AvatarSkeleton : MonoBehaviour
     private Avatar _baseAvatar;
 
     [SerializeField]
-    [Tooltip("肩から肘への距離係数")]
-    private float _elbowDistanceCoff = 0.28f;
-
-    [SerializeField]
-    [Tooltip("肩からArmまでの距離係数")]
-    private float _armDistanceCoff = 0.05f;
-
-    [SerializeField]
-    [Tooltip("首元から肩へのX位置オフセット")]
-    private float _shoulderOffsetX = 0.1f;
-
-    [SerializeField]
-    [Tooltip("首元から肩へのY位置オフセット")]
-    private float _shoulderOffsetY = 0.05f;
-
-    [SerializeField]
-    [Tooltip("Headの位置から肩への位置オフセット")]
-    private float _nectOffset = 0.17f;
-
-    [SerializeField]
-    [Tooltip("HeadからHipへのオフセット")]
-    private float _hipOffset = 0.8f;
-
-    [SerializeField]
-    [Tooltip("HipからのUpperLeg左右オフセット")]
-    private float _upperLegHorizontalOffset = 0.1f;
-
-    [SerializeField]
-    [Tooltip("HipからのUpperLeg上下オフセット")]
-    private float _upperLegVerticalOffset = 0.1f;
-
-    [SerializeField]
-    [Tooltip("HipからFootにかけての距離から膝の位置を算出する係数")]
-    private float _lowerLegDistanceCoff = 0.5f;
+    [Tooltip("地面と足を浮かせる距離")]
+    private float _heightOffset = 0;
 
     [SerializeField]
     private Color[] _colors = new Color[20];
@@ -154,7 +123,7 @@ public class AvatarSkeleton : MonoBehaviour
     [SerializeField] private Transform _rightLittleDistal;
     #endregion ### ボーンへの参照 ###
 
-    private Dictionary<string, Transform> _transformDefinision = new Dictionary<string, Transform>();
+    private Dictionary<string, string> _transformDefinision = new Dictionary<string, string>();
     private List<Transform> _skeletonBones = new List<Transform>();
     private Dictionary<string, Transform> _skeletonBonesDic = new Dictionary<string, Transform>();
 
@@ -179,8 +148,9 @@ public class AvatarSkeleton : MonoBehaviour
     [ContextMenu("test")]
     public void test()
     {
-        CacheBoneNameMap(BoneNameConvention.FBX, _assetName);
+        //CacheBoneNameMap(BoneNameConvention.FBX, _assetName);
         SetupSkeleton();
+        SetupSkeletonDic();
         SetupBones();
         ReadAvatar();
         Setup();
@@ -229,6 +199,7 @@ public class AvatarSkeleton : MonoBehaviour
             }
         }*/
 
+/*
     private void OnDrawGizmos()
     {
         if (!_showVisualizer)
@@ -265,7 +236,7 @@ public class AvatarSkeleton : MonoBehaviour
         Gizmos.DrawLine(_rightUpperLeg.position, _rightLowerLeg.position);
         Gizmos.DrawLine(_rightLowerLeg.position, _rightFoot.position);
         Gizmos.DrawLine(_rightFoot.position, _rightToes.position);
-    }
+    }*/
     #endregion ### MonoBehaviour ###
 
     /// <summary>
@@ -349,9 +320,12 @@ public class AvatarSkeleton : MonoBehaviour
         {
             //Debug.Log(hb.humanName);
             //Debug.Log(hb.boneName);
-            if(_transformDefinision.ContainsKey(hb.humanName) && _skeletonBonesDic.ContainsKey(hb.boneName))
+            if(_transformDefinision.ContainsKey(hb.humanName))
             {
-                _transformDefinision[hb.humanName] = _skeletonBonesDic[hb.boneName];
+                if(_transformDefinision[hb.humanName] != "") continue;
+                _transformDefinision[hb.humanName] = hb.boneName;
+                //_transformDefinision[hb.humanName] = _skeletonBonesDic[hb.boneName].name;
+                //Debug.Log(hb.boneName +" "+_skeletonBonesDic[hb.boneName].name);
             }
 
 
@@ -511,61 +485,61 @@ public class AvatarSkeleton : MonoBehaviour
             _transformDefinision.Add("LeftToes", _leftToes);
             _transformDefinision.Add("RightToes", _rightToes);
     */
-_transformDefinision.Add("Hips",_hips);
-_transformDefinision.Add("LeftUpperLeg",_leftUpperLeg);
-_transformDefinision.Add("RightUpperLeg",_rightUpperLeg);
-_transformDefinision.Add("LeftLowerLeg",_leftLowerLeg);
-_transformDefinision.Add("RightLowerLeg",_rightLowerLeg);
-_transformDefinision.Add("LeftFoot",_leftFoot);
-_transformDefinision.Add("RightFoot",_rightFoot);
-_transformDefinision.Add("Spine",_spine);
-_transformDefinision.Add("Chest",_chest);
-_transformDefinision.Add("Neck",_neck);
-_transformDefinision.Add("Head",_head);
-_transformDefinision.Add("LeftShoulder",_leftShoulder);
-_transformDefinision.Add("RightShoulder",_rightShoulder);
-_transformDefinision.Add("LeftUpperArm",_leftUpperArm);
-_transformDefinision.Add("RightUpperArm",_rightUpperArm);
-_transformDefinision.Add("LeftLowerArm",_leftLowerArm);
-_transformDefinision.Add("RightLowerArm",_rightLowerArm);
-_transformDefinision.Add("LeftHand",_leftHand);
-_transformDefinision.Add("RightHand",_rightHand);
-_transformDefinision.Add("LeftToes",_leftToes);
-_transformDefinision.Add("RightToes",_rightToes);
-_transformDefinision.Add("LeftEye",_leftEye);
-_transformDefinision.Add("RightEye",_rightEye);
-_transformDefinision.Add("Jaw",_jaw);
-_transformDefinision.Add("Left Thumb Proximal",_leftThumbProximal);
-_transformDefinision.Add("Left Thumb Intermediate",_leftThumbIntermediate);
-_transformDefinision.Add("Left Thumb Distal",_leftThumbDistal);
-_transformDefinision.Add("Left Index Proximal",_leftIndexProximal);
-_transformDefinision.Add("Left Index Intermediate",_leftIndexIntermediate);
-_transformDefinision.Add("Left Index Distal",_leftIndexDistal);
-_transformDefinision.Add("Left Middle Proximal",_leftMiddleProximal);
-_transformDefinision.Add("Left Middle Intermediate",_leftMiddleIntermediate);
-_transformDefinision.Add("Left Middle Distal",_leftMiddleDistal);
-_transformDefinision.Add("Left Ring Proximal",_leftRingProximal);
-_transformDefinision.Add("Left Ring Intermediate",_leftRingIntermediate);
-_transformDefinision.Add("Left Ring Distal",_leftRingDistal);
-_transformDefinision.Add("Left Little Proximal",_leftLittleProximal);
-_transformDefinision.Add("Left Little Intermediate",_leftLittleIntermediate);
-_transformDefinision.Add("Left Little Distal",_leftLittleDistal);
-_transformDefinision.Add("Right Thumb Proximal",_rightThumbProximal);
-_transformDefinision.Add("Right Thumb Intermediate",_rightThumbIntermediate);
-_transformDefinision.Add("Right Thumb Distal",_rightThumbDistal);
-_transformDefinision.Add("Right Index Proximal",_rightIndexProximal);
-_transformDefinision.Add("Right Index Intermediate",_rightIndexIntermediate);
-_transformDefinision.Add("Right Index Distal",_rightIndexDistal);
-_transformDefinision.Add("Right Middle Proximal",_rightMiddleProximal);
-_transformDefinision.Add("Right Middle Intermediate",_rightMiddleIntermediate);
-_transformDefinision.Add("Right Middle Distal",_rightMiddleDistal);
-_transformDefinision.Add("Right Ring Proximal",_rightRingProximal);
-_transformDefinision.Add("Right Ring Intermediate",_rightRingIntermediate);
-_transformDefinision.Add("Right Ring Distal",_rightRingDistal);
-_transformDefinision.Add("Right Little Proximal",_rightLittleProximal);
-_transformDefinision.Add("Right Little Intermediate",_rightLittleIntermediate);
-_transformDefinision.Add("Right Little Distal",_rightLittleDistal);
-_transformDefinision.Add("UpperChest",_upperChest);
+if(_hips != null ) _transformDefinision.Add("Hips",_hips.name); else _transformDefinision.Add("Hips","");
+if(_leftUpperLeg != null ) _transformDefinision.Add("LeftUpperLeg",_leftUpperLeg.name); else _transformDefinision.Add("LeftUpperLeg","");
+if(_rightUpperLeg != null ) _transformDefinision.Add("RightUpperLeg",_rightUpperLeg.name); else _transformDefinision.Add("RightUpperLeg","");
+if(_leftLowerLeg != null ) _transformDefinision.Add("LeftLowerLeg",_leftLowerLeg.name); else _transformDefinision.Add("LeftLowerLeg","");
+if(_rightLowerLeg != null ) _transformDefinision.Add("RightLowerLeg",_rightLowerLeg.name); else _transformDefinision.Add("RightLowerLeg","");
+if(_leftFoot != null ) _transformDefinision.Add("LeftFoot",_leftFoot.name); else _transformDefinision.Add("LeftFoot","");
+if(_rightFoot != null ) _transformDefinision.Add("RightFoot",_rightFoot.name); else _transformDefinision.Add("RightFoot","");
+if(_spine != null ) _transformDefinision.Add("Spine",_spine.name); else _transformDefinision.Add("Spine","");
+if(_chest != null ) _transformDefinision.Add("Chest",_chest.name); else _transformDefinision.Add("Chest","");
+if(_neck != null ) _transformDefinision.Add("Neck",_neck.name); else _transformDefinision.Add("Neck","");
+if(_head != null ) _transformDefinision.Add("Head",_head.name); else _transformDefinision.Add("Head","");
+if(_leftShoulder != null ) _transformDefinision.Add("LeftShoulder",_leftShoulder.name); else _transformDefinision.Add("LeftShoulder","");
+if(_rightShoulder != null ) _transformDefinision.Add("RightShoulder",_rightShoulder.name); else _transformDefinision.Add("RightShoulder","");
+if(_leftUpperArm != null ) _transformDefinision.Add("LeftUpperArm",_leftUpperArm.name); else _transformDefinision.Add("LeftUpperArm","");
+if(_rightUpperArm != null ) _transformDefinision.Add("RightUpperArm",_rightUpperArm.name); else _transformDefinision.Add("RightUpperArm","");
+if(_leftLowerArm != null ) _transformDefinision.Add("LeftLowerArm",_leftLowerArm.name); else _transformDefinision.Add("LeftLowerArm","");
+if(_rightLowerArm != null ) _transformDefinision.Add("RightLowerArm",_rightLowerArm.name); else _transformDefinision.Add("RightLowerArm","");
+if(_leftHand != null ) _transformDefinision.Add("LeftHand",_leftHand.name); else _transformDefinision.Add("LeftHand","");
+if(_rightHand != null ) _transformDefinision.Add("RightHand",_rightHand.name); else _transformDefinision.Add("RightHand","");
+if(_leftToes != null ) _transformDefinision.Add("LeftToes",_leftToes.name); else _transformDefinision.Add("LeftToes","");
+if(_rightToes != null ) _transformDefinision.Add("RightToes",_rightToes.name); else _transformDefinision.Add("RightToes","");
+if(_leftEye != null ) _transformDefinision.Add("LeftEye",_leftEye.name); else _transformDefinision.Add("LeftEye","");
+if(_rightEye != null ) _transformDefinision.Add("RightEye",_rightEye.name); else _transformDefinision.Add("RightEye","");
+if(_jaw != null ) _transformDefinision.Add("Jaw",_jaw.name); else _transformDefinision.Add("Jaw","");
+if(_leftThumbProximal != null ) _transformDefinision.Add("Left Thumb Proximal",_leftThumbProximal.name); else _transformDefinision.Add("Left Thumb Proximal","");
+if(_leftThumbIntermediate != null ) _transformDefinision.Add("Left Thumb Intermediate",_leftThumbIntermediate.name); else _transformDefinision.Add("Left Thumb Intermediate","");
+if(_leftThumbDistal != null ) _transformDefinision.Add("Left Thumb Distal",_leftThumbDistal.name); else _transformDefinision.Add("Left Thumb Distal","");
+if(_leftIndexProximal != null ) _transformDefinision.Add("Left Index Proximal",_leftIndexProximal.name); else _transformDefinision.Add("Left Index Proximal","");
+if(_leftIndexIntermediate != null ) _transformDefinision.Add("Left Index Intermediate",_leftIndexIntermediate.name); else _transformDefinision.Add("Left Index Intermediate","");
+if(_leftIndexDistal != null ) _transformDefinision.Add("Left Index Distal",_leftIndexDistal.name); else _transformDefinision.Add("Left Index Distal","");
+if(_leftMiddleProximal != null ) _transformDefinision.Add("Left Middle Proximal",_leftMiddleProximal.name); else _transformDefinision.Add("Left Middle Proximal","");
+if(_leftMiddleIntermediate != null ) _transformDefinision.Add("Left Middle Intermediate",_leftMiddleIntermediate.name); else _transformDefinision.Add("Left Middle Intermediate","");
+if(_leftMiddleDistal != null ) _transformDefinision.Add("Left Middle Distal",_leftMiddleDistal.name); else _transformDefinision.Add("Left Middle Distal","");
+if(_leftRingProximal != null ) _transformDefinision.Add("Left Ring Proximal",_leftRingProximal.name); else _transformDefinision.Add("Left Ring Proximal","");
+if(_leftRingIntermediate != null ) _transformDefinision.Add("Left Ring Intermediate",_leftRingIntermediate.name); else _transformDefinision.Add("Left Ring Intermediate","");
+if(_leftRingDistal != null ) _transformDefinision.Add("Left Ring Distal",_leftRingDistal.name); else _transformDefinision.Add("Left Ring Distal","");
+if(_leftLittleProximal != null ) _transformDefinision.Add("Left Little Proximal",_leftLittleProximal.name); else _transformDefinision.Add("Left Little Proximal","");
+if(_leftLittleIntermediate != null ) _transformDefinision.Add("Left Little Intermediate",_leftLittleIntermediate.name); else _transformDefinision.Add("Left Little Intermediate","");
+if(_leftLittleDistal != null ) _transformDefinision.Add("Left Little Distal",_leftLittleDistal.name); else _transformDefinision.Add("Left Little Distal","");
+if(_rightThumbProximal != null ) _transformDefinision.Add("Right Thumb Proximal",_rightThumbProximal.name); else _transformDefinision.Add("Right Thumb Proximal","");
+if(_rightThumbIntermediate != null ) _transformDefinision.Add("Right Thumb Intermediate",_rightThumbIntermediate.name); else _transformDefinision.Add("Right Thumb Intermediate","");
+if(_rightThumbDistal != null ) _transformDefinision.Add("Right Thumb Distal",_rightThumbDistal.name); else _transformDefinision.Add("Right Thumb Distal","");
+if(_rightIndexProximal != null ) _transformDefinision.Add("Right Index Proximal",_rightIndexProximal.name); else _transformDefinision.Add("Right Index Proximal","");
+if(_rightIndexIntermediate != null ) _transformDefinision.Add("Right Index Intermediate",_rightIndexIntermediate.name); else _transformDefinision.Add("Right Index Intermediate","");
+if(_rightIndexDistal != null ) _transformDefinision.Add("Right Index Distal",_rightIndexDistal.name); else _transformDefinision.Add("Right Index Distal","");
+if(_rightMiddleProximal != null ) _transformDefinision.Add("Right Middle Proximal",_rightMiddleProximal.name); else _transformDefinision.Add("Right Middle Proximal","");
+if(_rightMiddleIntermediate != null ) _transformDefinision.Add("Right Middle Intermediate",_rightMiddleIntermediate.name); else _transformDefinision.Add("Right Middle Intermediate","");
+if(_rightMiddleDistal != null ) _transformDefinision.Add("Right Middle Distal",_rightMiddleDistal.name); else _transformDefinision.Add("Right Middle Distal","");
+if(_rightRingProximal != null ) _transformDefinision.Add("Right Ring Proximal",_rightRingProximal.name); else _transformDefinision.Add("Right Ring Proximal","");
+if(_rightRingIntermediate != null ) _transformDefinision.Add("Right Ring Intermediate",_rightRingIntermediate.name); else _transformDefinision.Add("Right Ring Intermediate","");
+if(_rightRingDistal != null ) _transformDefinision.Add("Right Ring Distal",_rightRingDistal.name); else _transformDefinision.Add("Right Ring Distal","");
+if(_rightLittleProximal != null ) _transformDefinision.Add("Right Little Proximal",_rightLittleProximal.name); else _transformDefinision.Add("Right Little Proximal","");
+if(_rightLittleIntermediate != null ) _transformDefinision.Add("Right Little Intermediate",_rightLittleIntermediate.name); else _transformDefinision.Add("Right Little Intermediate","");
+if(_rightLittleDistal != null ) _transformDefinision.Add("Right Little Distal",_rightLittleDistal.name); else _transformDefinision.Add("Right Little Distal","");
+if(_upperChest != null ) _transformDefinision.Add("UpperChest",_upperChest.name); else _transformDefinision.Add("UpperChest","");
 
     }
 
@@ -649,31 +623,49 @@ _transformDefinision.Add("UpperChest",_upperChest);
             baseSkeltonBonesDic.Add(hb.name,hb);
         }
 
+        string hipBoneName = "";
+
         List<HumanBone> humanBones = new List<HumanBone>(humanTraitBoneNames.Length);
         for (int i = 0; i < humanTraitBoneNames.Length; i++)
         {
             string humanBoneName = humanTraitBoneNames[i];
             
-            Transform bone;
+            string bone;
             if (_transformDefinision.TryGetValue(humanBoneName, out bone))
             {
                 HumanBone humanBone = new HumanBone();
                 humanBone.humanName = humanBoneName;
                 Debug.Log(humanBoneName);
-                if(bone == null)
+                if((bone == null))
                 {
-                    //Debug.Log(humanBoneName);
+                    Debug.Log(humanBoneName);
                     continue;
                 }
-                humanBone.boneName = bone.name;
-                humanBone.limit.useDefaultValues = basehumanBonesDic[bone.name].limit.useDefaultValues;
-                humanBone.limit = basehumanBonesDic[bone.name].limit;
+
+                if((bone == "") && !basehumanBonesDic.ContainsKey(bone)) continue;
+                humanBone.boneName = bone;
+
+                if(basehumanBonesDic.ContainsKey(bone))
+                {
+                    humanBone.limit.useDefaultValues = basehumanBonesDic[bone].limit.useDefaultValues;
+                    humanBone.limit = basehumanBonesDic[bone].limit;
+                }
+                else
+                {
+                    humanBone.limit.useDefaultValues = true;
+                }
 
                 humanBones.Add(humanBone);
+
+                if(humanBoneName == "Hips") hipBoneName = bone;
             }
         }
 
         List<SkeletonBone> skeletonBones = new List<SkeletonBone>(_skeletonBones.Count + 1);
+
+        bool isAvatarHeightSetting = false;
+
+        Transform hipTransform =_hips;
 
         for (int i = 0; i < _skeletonBones.Count; i++)
         {
@@ -683,23 +675,47 @@ _transformDefinision.Add("UpperChest",_upperChest);
             skelBone.name = bone.name;
             if(baseSkeltonBonesDic.ContainsKey(bone.name))
             {
-                skelBone.position = baseSkeltonBonesDic[bone.name].position;
+                if(!isAvatarHeightSetting)
+                {
+                    for(int j=0;j<bone.childCount;j++)
+                    {
+                        if(bone.GetChild(j).name == hipBoneName)
+                        {
+                            skelBone.position = baseSkeltonBonesDic[bone.name].position + new Vector3(0,_heightOffset,0);
+                            isAvatarHeightSetting = true;
+                            break;
+                        }
+                    }
+                    skelBone.position = baseSkeltonBonesDic[bone.name].position;
+                }
+                else
+                {
+                    skelBone.position = baseSkeltonBonesDic[bone.name].position;
+                }
+                
+
+                
                 skelBone.rotation = baseSkeltonBonesDic[bone.name].rotation;
                 skelBone.scale = baseSkeltonBonesDic[bone.name].scale;
             }
             else
             {
-                skelBone.position = bone.position;
-                skelBone.rotation = bone.rotation;
-                skelBone.scale = Vector3.one;
+                skelBone.position = bone.localPosition;
+                skelBone.rotation = bone.localRotation;
+                skelBone.scale = bone.localScale;
             }
 
             skeletonBones.Add(skelBone);
+            if(bone.name == hipBoneName) hipTransform = bone;
+
+            
         }
 
         HumanDescription humanDesc = _baseAvatar.humanDescription;
         humanDesc.human = humanBones.ToArray();
         humanDesc.skeleton = skeletonBones.ToArray();
+        
+        humanDesc.hasTranslationDoF = false;
 
         _srcAvatar = AvatarBuilder.BuildHumanAvatar(gameObject, humanDesc);
         _srcAvatar.name = "AvatarSystem";
