@@ -7,7 +7,7 @@ using UnityEditor;
 using VRC.SDK3.Avatars.Components;
 
 
-public class AvatarSkeleton : MonoBehaviour
+public class HumanoidAvatarRemapper : MonoBehaviour
 {
 
     #region ### Veriables ###
