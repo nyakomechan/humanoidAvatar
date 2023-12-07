@@ -111,7 +111,7 @@ public class HumanoidAvatarRemapper : MonoBehaviour
 
 
     [ContextMenu("Create remap avatar file")]
-    public void test()
+    public void CreateRemapAvatar()
     {
         //CacheBoneNameMap(BoneNameConvention.FBX, _assetName);
         if(_baseAvatar == null)SetBaseAvatarAsset();
