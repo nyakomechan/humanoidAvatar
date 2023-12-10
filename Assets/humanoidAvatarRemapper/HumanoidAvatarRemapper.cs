@@ -333,7 +333,7 @@ public class HumanoidAvatarRemapper : MonoBehaviour
         for (int i = 0; i < current.childCount; i++)
         {
             Transform child = current.GetChild(i);
-            RecursiveSkeleton(child, ref skeletons);
+            if(child.gameObject.name.Split('_').Last() != "noSkeleton") RecursiveSkeleton(child, ref skeletons);
         }
     }
 
@@ -361,7 +361,11 @@ public class HumanoidAvatarRemapper : MonoBehaviour
         for (int i = 0; i < current.childCount; i++)
         {
             Transform child = current.GetChild(i);
-            RecursiveSkeletonDic(child, ref skeletons);
+            if(child.gameObject.name.Split('_').Last() != "noSkeleton") 
+            {
+                RecursiveSkeletonDic(child, ref skeletons);
+            };
+            //RecursiveSkeletonDic(child, ref skeletons);
         }
     }
 
@@ -486,7 +490,8 @@ public class HumanoidAvatarRemapper : MonoBehaviour
                         hipsYOffset = _leftToes.position.y - _root.position.y;
                     }
 
-                    skelBone.position = baseSkeltonBonesDic[bone.name].position + new Vector3(0, -hipsYOffset+_hipsHeightOffset, 0);
+                    skelBone.position = baseSkeltonBonesDic[bone.name].position 
+                                        + Quaternion.Inverse(baseSkeltonBonesDic[bone.name].rotation)*new Vector3(0, -hipsYOffset+_hipsHeightOffset, 0);
                     Debug.Log("Height offset is "+ (hipsYOffset+_hipsHeightOffset));
                 }
                 else{
@@ -530,22 +535,33 @@ public class HumanoidAvatarRemapper : MonoBehaviour
 
 
         #if UNITY_EDITOR
-        AssetDatabase.CreateAsset(_srcAvatar, "Assets/" + _baseAvatar.name + "_remap.asset");
+        AssetDatabase.CreateAsset(_srcAvatar, "Assets/nyakomake/transformLeg/" + _baseAvatar.name + "_remap.asset");
         AssetDatabase.SaveAssets();
+        _avatar.GetComponent<Animator>().avatar = (Avatar)AssetDatabase.LoadAssetAtPath("Assets/nyakomake/transformLeg/" + _baseAvatar.name + "_remap.asset", typeof(Avatar));
         #endif
        
     }
+
+    [SerializeField]private Vector3 _defaultEyePos = new Vector3(0,0,0);
 
     public VRCAvatarDescriptor _avatarDescripter;
     [ContextMenu("Add height offset to View position in VRCAvatarDescriptor")]
     public void SetViewPos()
     {
+        _avatarDescripter = _avatar.GetComponent<VRCAvatarDescriptor>();
+        if(_defaultEyePos.y == 0)_defaultEyePos = _avatarDescripter.ViewPosition;
         float hipsYOffset = 0;
-                    if(_leftToes != null && _rightToes != null)
-                    {
-                        hipsYOffset = _leftToes.position.y - _root.position.y;
-                    }
+        if(_leftToes != null && _rightToes != null)
+        {
+            hipsYOffset = _leftToes.position.y - _root.position.y;
+        }
         _avatarDescripter.ViewPosition = _avatarDescripter.ViewPosition+new Vector3(0,-hipsYOffset,0);
+    }
+
+    public void RevertViewPos()
+    {
+        _avatarDescripter = _avatar.GetComponent<VRCAvatarDescriptor>();
+        _avatarDescripter.ViewPosition = _defaultEyePos;
     }
 }
 
